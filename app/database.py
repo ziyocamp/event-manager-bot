@@ -2,7 +2,7 @@ from sqlalchemy import create_engine, URL
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
-import app.config as config
+from app.config import settings as config
 
 DATABASE_URL = URL.create(
     "postgresql+psycopg2",
@@ -18,6 +18,7 @@ engine = create_engine(DATABASE_URL)
 Base = declarative_base()
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
 
 def get_db():
     db = SessionLocal()

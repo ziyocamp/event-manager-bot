@@ -1,7 +1,7 @@
 from telegram.ext import Updater
 
 from app.config import settings
-from app.bot.handlers import start
+from app.bot.handlers import start, settings as settings_handler
 
 
 def run_bot():
@@ -9,6 +9,7 @@ def run_bot():
     dispatcher = updater.dispatcher
 
     start.register(dispatcher)
+    settings_handler.register(dispatcher)
 
     updater.start_polling()
     updater.idle()

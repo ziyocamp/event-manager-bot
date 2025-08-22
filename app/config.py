@@ -17,4 +17,10 @@ class Settings:
     DB_NAME = os.getenv("DB_NAME", "database")
 
 
+class ChangeNameStates:
+    ENTER_NAME = 0
+    CONFIRM_NAME = 1
+
+
 settings = Settings()
+change_name_states = ChangeNameStates()

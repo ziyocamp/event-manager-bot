@@ -18,3 +18,12 @@ def create_user(db: Session, telegram_id: int, username: str, full_name: str):
     db.commit()
     db.refresh(user)
     return user
+
+
+def update_user_full_name(db: Session, telegram_id: int, full_name: str):
+    user = db.query(User).filter(User.telegram_id == telegram_id).first()
+    if user:
+        user.full_name = full_name
+        db.commit()
+        db.refresh(user)
+    return user

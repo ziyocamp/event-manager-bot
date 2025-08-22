@@ -7,9 +7,9 @@ from app.database import Base
 
 
 class RoleEnum(enum.Enum):
-    user = "user"
-    organizer = "organizer"
-    admin = "admin"
+    user = "User"
+    organizer = "Tashkilotchi"
+    admin = "Admin"
 
 
 class User(Base):

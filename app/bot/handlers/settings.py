@@ -5,10 +5,10 @@ from app.database import SessionLocal
 from app.models import user
 from app.models.user import User, RoleEnum
 
-from app.config import change_name_states
+from app.config import change_name_states, change_role_states
 
 from app.repositories.user_repo import get_user_by_telegram_id, update_user_full_name
-from app.bot.keyboards.settings import change_user_role_keyboard, change_name_keyboard, get_settings_keyboard
+from app.bot.keyboards.settings import get_change_user_role_keyboard, get_confirm_role_keyboard, change_name_keyboard, get_settings_keyboard
 
 from app.bot.handlers.start import start
 
@@ -78,8 +78,67 @@ def cancel_name_change(update: Update, context: CallbackContext):
     return ConversationHandler.END
 
 
+def send_role_change(update: Update, context: CallbackContext):
+    session = SessionLocal()
+    user = get_user_by_telegram_id(session, update.effective_user.id)
+    if not user:
+        start(update, context)
+        return
+
+    update.message.reply_text("Yangi rolni tanlang:", reply_markup=get_change_user_role_keyboard(user))
+    return change_role_states.ENTER_ROLE
+
+
+def enter_role(update: Update, context: CallbackContext):
+    session = SessionLocal()
+    user = get_user_by_telegram_id(session, update.effective_user.id)
+    if not user:
+        start(update, context)
+        return
+
+    context.user_data['new_role'] = update.callback_query.data.split(":")[1]
+    update.callback_query.message.reply_text(f"Rolingiz {context.user_data['new_role']} deb o'zgartirilsinmi?", reply_markup=get_confirm_role_keyboard(user))
+    return change_role_states.CONFIRM_ROLE
+
+
+def confirm_role_change(update: Update, context: CallbackContext):
+    session = SessionLocal()
+    user = get_user_by_telegram_id(session, update.effective_user.id)
+    if not user:
+        start(update, context)
+        return
+
+    user.role = RoleEnum(context.user_data['new_role'])
+    session.commit()
+    update.callback_query.message.reply_text(f"Rolingiz {user.role.value} deb o'zgartirildi.")
+
+    return ConversationHandler.END
+
+
+def cancel_role_change(update: Update, context: CallbackContext):
+    update.callback_query.message.reply_text("Rolni o'zgartirish bekor qilindi.")
+
+    context.user_data.clear()
+    return ConversationHandler.END
+
+
 def register(dispatcher: Dispatcher):
     dispatcher.add_handler(MessageHandler(Filters.text("⚙️ Sozlamalar"), send_settings))
+
+    conversation_handler = ConversationHandler(
+        entry_points=[MessageHandler(Filters.text("Roli o'zgartirish"), send_role_change)],
+        states={
+            change_role_states.ENTER_ROLE: [
+                CallbackQueryHandler(enter_role, pattern="^set_role:Tashkilotchi$|^set_role:User$")
+            ],
+            change_role_states.CONFIRM_ROLE: [
+                CallbackQueryHandler(confirm_role_change, pattern="set_role:confirm"),
+                CallbackQueryHandler(cancel_role_change, pattern="set_role:cancel")
+            ]
+        },
+        fallbacks=[MessageHandler(Filters.text("Bekor qilish"), send_settings)],
+    )
+    dispatcher.add_handler(conversation_handler)
 
     conversation_handler = ConversationHandler(
         entry_points=[MessageHandler(Filters.text("Ismni o'zgartirish"), change_name)],

@@ -1,5 +1,5 @@
 from telegram import Update, ReplyKeyboardMarkup
-from telegram.ext import CallbackContext, CommandHandler
+from telegram.ext import CallbackContext, CommandHandler, MessageHandler, Filters
 
 from app.database import SessionLocal
 from app.repositories.user_repo import get_user_by_telegram_id, create_user
@@ -34,5 +34,12 @@ def start(update: Update, context: CallbackContext):
     update.message.reply_text(message, reply_markup=reply_markup)
 
 
+def main_menu(update: Update, context: CallbackContext):
+    reply_markup = get_main_menu_keyboard()
+    update.message.reply_text("Bosh menu:", reply_markup=reply_markup)
+
+
 def register(dispatcher):
     dispatcher.add_handler(CommandHandler("start", start))
+    dispatcher.add_handler(MessageHandler(Filters.text("Bosh menu") & ~Filters.command, main_menu))
+

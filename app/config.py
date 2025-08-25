@@ -21,6 +21,11 @@ class ChangeNameStates:
     ENTER_NAME = 0
     CONFIRM_NAME = 1
 
+class ChangeRoleStates:
+    ENTER_ROLE = 0
+    CONFIRM_ROLE = 1
+
 
 settings = Settings()
 change_name_states = ChangeNameStates()
+change_role_states = ChangeRoleStates()

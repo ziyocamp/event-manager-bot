@@ -16,8 +16,6 @@ def start(update: Update, context: CallbackContext):
     try:
         existing_user = get_user_by_telegram_id(db, telegram_id)
         if not existing_user:
-            print(telegram_id, username, full_name)
-            
             create_user(db, telegram_id, username, full_name)
             db_message = "✅ Sizning profilingiz yaratildi."
         else:

@@ -4,6 +4,7 @@ from telegram.ext import CallbackContext, MessageHandler, Filters, Dispatcher, C
 from app.database import SessionLocal
 from app.repositories.event_repo import get_all_events, get_event_by_id, get_ticket_by_id
 from app.repositories.user_repo import get_user_by_telegram_id
+from app.repositories.booking_repo import create_booking
 
 
 def send_events(update: Update, context: CallbackContext):
@@ -101,6 +102,7 @@ def buy_ticket(update: Update, context: CallbackContext):
             update.callback_query.message.reply_text("Ticket yoki foydalanuvchi topilmadi.")
             return
 
+        create_booking(db, user.id, ticket.event.id, ticket.id)
         update.callback_query.message.reply_text(f"Ticket #{ticket.id} xarid qilindi!")
 
 

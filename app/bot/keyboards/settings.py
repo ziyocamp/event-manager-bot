@@ -22,7 +22,7 @@ def get_confirm_role_keyboard(user: User) -> InlineKeyboardMarkup:
 
 def get_settings_keyboard() -> ReplyKeyboardMarkup:
     keyboard = [
-        [KeyboardButton("Roli o'zgartirish"), KeyboardButton("Ismni o'zgartirish")],
+        [KeyboardButton("🛒 Mening bookinglarim"), KeyboardButton("Ma'lumotlarimni o'zgartirish")],
         [KeyboardButton("Bosh menu")]
     ]
     return ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
@@ -34,3 +34,10 @@ def change_name_keyboard() -> InlineKeyboardMarkup:
         [InlineKeyboardButton("Yo'q", callback_data="change_name:cancel")]
     ]
     return InlineKeyboardMarkup(keyboard)
+
+
+def get_change_user_info_keyboard() -> ReplyKeyboardMarkup:
+    keyboard = [
+        [KeyboardButton("Roli o'zgartirish"), KeyboardButton("Ismni o'zgartirish")]
+    ]
+    return ReplyKeyboardMarkup(keyboard, resize_keyboard=True)

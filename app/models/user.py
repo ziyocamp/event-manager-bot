@@ -26,6 +26,7 @@ class User(Base):
 
     # Relationship example
     events = relationship("Event", back_populates="organizer")
+    bookings = relationship("Booking", back_populates="user")
 
     def __repr__(self):
         return f"<User(id={self.id}, username={self.username}, full_name={self.full_name}, role={self.role})>"

@@ -31,3 +31,4 @@ class Event(Base):
     # Relationship
     organizer = relationship("User", back_populates="events")
     tickets = relationship("Ticket", back_populates="event", cascade="all, delete")
+    bookings = relationship("Booking", back_populates="event", cascade="all, delete")

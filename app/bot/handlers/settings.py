@@ -8,7 +8,8 @@ from app.models.user import User, RoleEnum
 from app.config import change_name_states, change_role_states
 
 from app.repositories.user_repo import get_user_by_telegram_id, update_user_full_name
-from app.bot.keyboards.settings import get_change_user_role_keyboard, get_confirm_role_keyboard, change_name_keyboard, get_settings_keyboard
+from app.repositories.booking_repo import get_bookings_by_user_id
+from app.bot.keyboards.settings import get_change_user_role_keyboard, get_confirm_role_keyboard, change_name_keyboard, get_settings_keyboard, get_change_user_role_keyboard, get_change_user_info_keyboard
 
 from app.bot.handlers.start import start
 
@@ -39,6 +40,32 @@ def send_settings(update: Update, context: CallbackContext):
         settings_message += "\n- Siz foydalanuvchisiz. Faqat o'z eventlaringizni ko'rishingiz mumkin."
 
     update.message.reply_text(settings_message, reply_markup=get_settings_keyboard())
+
+
+def send_user_tickets(update: Update, context: CallbackContext):
+    with SessionLocal() as db:
+        user = get_user_by_telegram_id(db, update.effective_user.id)
+        if not user:
+            start(update, context)
+            return
+
+        bookings = get_bookings_by_user_id(db, user.id)
+        if not bookings:
+            update.message.reply_text("Sizda hech qanday bron mavjud emas.")
+            return
+
+        booking_list = []
+        for booking in bookings:
+            booking_list.append(f"Event: {booking.ticket.event.title}, Ticket: {booking.ticket.ticket_type}")
+
+        update.message.reply_text("Sizning bronlaringiz:\n" + "\n".join(booking_list))
+
+
+def send_change_user_info(update: Update, context: CallbackContext):
+    update.message.reply_text(
+        "Malumotlaringizni o'zgartirish uchun quyidagi ma'lumotlarni kiriting:",
+        reply_markup=get_change_user_info_keyboard()
+    )
 
 
 def change_name(update: Update, context: CallbackContext):
@@ -124,6 +151,8 @@ def cancel_role_change(update: Update, context: CallbackContext):
 
 def register(dispatcher: Dispatcher):
     dispatcher.add_handler(MessageHandler(Filters.text("⚙️ Sozlamalar"), send_settings))
+    dispatcher.add_handler(MessageHandler(Filters.text("🛒 Mening bookinglarim"), send_user_tickets))
+    dispatcher.add_handler(MessageHandler(Filters.text("Ma'lumotlarimni o'zgartirish"), send_change_user_info))
 
     conversation_handler = ConversationHandler(
         entry_points=[MessageHandler(Filters.text("Roli o'zgartirish"), send_role_change)],

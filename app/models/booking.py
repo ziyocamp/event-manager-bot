@@ -24,6 +24,6 @@ class Booking(Base):
     status = Column(Enum(BookingStatus), default=BookingStatus.pending, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
-    user = relationship("User")
-    event = relationship("Event")
+    user = relationship("User", back_populates="bookings")
+    event = relationship("Event", back_populates="bookings")
     ticket = relationship("Ticket", back_populates="bookings")

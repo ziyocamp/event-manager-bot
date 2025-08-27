@@ -6,17 +6,6 @@ from app.repositories.event_repo import get_all_events, get_event_by_id, get_tic
 from app.repositories.user_repo import get_user_by_telegram_id
 
 
-def build_menu(buttons, n_cols, header_buttons=None, footer_buttons=None):
-    menu = []
-    if header_buttons:
-        menu.append(header_buttons)
-    for i in range(0, len(buttons), n_cols):
-        menu.append(buttons[i:i + n_cols])
-    if footer_buttons:
-        menu.append(footer_buttons)
-    return menu
-
-
 def send_events(update: Update, context: CallbackContext):
     with SessionLocal() as db:
         events = get_all_events(db)
@@ -37,7 +26,6 @@ def send_events(update: Update, context: CallbackContext):
 
 def send_event_details(update: Update, context: CallbackContext):
     event_id = context.match.group(1)
-    print(event_id)
     with SessionLocal() as db:
         event = get_event_by_id(db, event_id)
         if not event:
